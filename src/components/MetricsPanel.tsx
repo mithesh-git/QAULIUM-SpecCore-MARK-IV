@@ -110,7 +110,7 @@ export default function MetricsPanel() {
         {/* Bloch sphere */}
         <BlochSphere x={blochVector.x} y={blochVector.y} z={blochVector.z} />
         <Typography variant="caption" sx={{ color: '#556677', display: 'block', textAlign: 'center', mb: 1 }}>
-          Bloch Sphere  |r|={Math.sqrt(blochVector.x**2 + blochVector.y**2 + blochVector.z**2).toFixed(3)}
+          Bloch Sphere  |r|={Math.sqrt(blochVector.x * blochVector.x + blochVector.y * blochVector.y + blochVector.z * blochVector.z).toFixed(3)}
         </Typography>
 
         <Divider sx={{ borderColor: 'rgba(0,212,255,0.1)', mb: 1 }} />

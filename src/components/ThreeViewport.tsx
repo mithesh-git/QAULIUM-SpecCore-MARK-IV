@@ -26,6 +26,32 @@ export default function ThreeViewport() {
   useEffect(() => { qRef.current = quantum }, [quantum])
   useEffect(() => { elRef.current = electronics }, [electronics])
 
+  const updateFieldMap = useCallback(() => {
+    const el = elRef.current
+    const viz = vizRef.current
+    const coils = new RFCoils({
+      current: el.rfCoil.current,
+      frequency: el.rfCoil.frequency,
+      fieldStrength: el.rfCoil.fieldStrength,
+      uniformity: el.rfCoil.uniformity,
+      gradientX: el.rfCoil.gradientX,
+      gradientY: el.rfCoil.gradientY,
+      gradientZ: el.rfCoil.gradientZ,
+    })
+    const fieldPoints = coils.generateFieldMap(1.0, 10)
+    fieldVizRef.current?.updateFieldArrows(
+      fieldPoints,
+      viz.showRFField,
+      viz.fieldHeatmapIntensity,
+    )
+    fieldVizRef.current?.updateHeatmap(
+      fieldPoints,
+      viz.showMagneticField,
+      viz.fieldHeatmapIntensity,
+      10,
+    )
+  }, [])
+
   const initScene = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas || sceneRef.current) return
@@ -71,33 +97,7 @@ export default function ThreeViewport() {
     updateFieldMap()
 
     sceneRef.current.start()
-  }, [])
-
-  const updateFieldMap = () => {
-    const el = elRef.current
-    const viz = vizRef.current
-    const coils = new RFCoils({
-      current: el.rfCoil.current,
-      frequency: el.rfCoil.frequency,
-      fieldStrength: el.rfCoil.fieldStrength,
-      uniformity: el.rfCoil.uniformity,
-      gradientX: el.rfCoil.gradientX,
-      gradientY: el.rfCoil.gradientY,
-      gradientZ: el.rfCoil.gradientZ,
-    })
-    const fieldPoints = coils.generateFieldMap(1.0, 10)
-    fieldVizRef.current?.updateFieldArrows(
-      fieldPoints,
-      viz.showRFField,
-      viz.fieldHeatmapIntensity,
-    )
-    fieldVizRef.current?.updateHeatmap(
-      fieldPoints,
-      viz.showMagneticField,
-      viz.fieldHeatmapIntensity,
-      10,
-    )
-  }
+  }, [updateFieldMap])
 
   // Initialise on mount
   useEffect(() => {
@@ -125,6 +125,7 @@ export default function ThreeViewport() {
   useEffect(() => {
     updateFieldMap()
   }, [
+    updateFieldMap,
     electronics.rfCoil.current,
     electronics.rfCoil.gradientX,
     electronics.rfCoil.gradientY,
